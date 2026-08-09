@@ -127,13 +127,16 @@
         .normal-img { opacity: 1; z-index: 2; transform: scale(1); }
         .goofy-img { opacity: 0; z-index: 3; transform: scale(1.05); }
 
-        .doran-img .normal-img { transform: scale(0.95); transform-origin: top center; }
-        .oner-img .normal-img { transform: scale(1.05); transform-origin: top center; }
-        .peyz-img { background-color: #e4e4e4; } 
-        .peyz-img .normal-img { transform: scale(0.95); transform-origin: bottom center; }
-        .keria-img .normal-img { transform: scale(0.95); transform-origin: top center; }
+        /* 선수별 이미지 위치 및 스케일 정밀 교정 (1:1 비율 맞춤) */
+        .doran-img .normal-img { transform: scale(1.15) translateY(5%); transform-origin: top center; }
+        .oner-img .normal-img { transform: scale(1.1) translateY(8%); transform-origin: top center; }
+        .peyz-img { background-color: #111; } 
+        .peyz-img .normal-img { transform: scale(1.1) translateY(5%); transform-origin: top center; }
+        .keria-img .normal-img { transform: scale(1.05) translateY(2%); transform-origin: top center; }
 
-        .player-card:not(.meme-card):hover .normal-img { transform: scale(1.05); }
+        .player-card:not(.meme-card):hover .normal-img { transform: scale(1.15); }
+        .player-card.meme-card:not(.active):hover .normal-img { transform: scale(1.2); } /* 호버 시에도 교정된 스케일 유지하며 확대 */
+        
         .meme-card.active .normal-img { opacity: 0; transform: scale(0.95); }
         .meme-card.active .goofy-img { opacity: 1; transform: scale(1.05); }
 
