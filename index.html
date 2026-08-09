@@ -468,7 +468,7 @@
     <div class="modal-overlay" id="tp-modal">
         <div class="modal-box">
             <div class="tp-title">텔포 합류 반응속도</div>
-            <p style="font-size:0.85rem; color:#ccc; margin:0;">화면이 파랗게 빛날 때 가장 빠르게 클릭하여 합류하세요!</p>
+            <p style="font-size:0.85rem; color:#ccc; margin:0;">화면 파랗게 빛날 때 가장 빠르게 클릭하여 합류하세요!</p>
             
             <div class="tp-screen" id="tp-screen">
                 <span class="tp-text" id="tp-text">클릭해서 준비</span>
@@ -741,7 +741,6 @@
             });
         });
 
-        // 사용자의 원본 코드를 그대로 활용하여 이모지가 제대로 보이게 렌더링
         function renderDrawTarget(c) {
             c.textAlign = "center";
             c.textBaseline = "middle";
@@ -874,7 +873,7 @@
                 borderColor = "var(--t1-red)";
                 if (seqStr === '승승') finalMsg = "이것이 V6의 품격! 서커스 대개장하며 깔끔한 2:0 승리 🎪";
                 else if (seqStr === '패승승') finalMsg = "1세트 줘도 돼~ 짜릿한 패승승 역전승 🔥";
-                else if (seqStr === '승패승') finalMsg = "승패승? 오히려 좋아! 티밀리 심장 쫄깃해지는 꽉 찬 승리 💦";
+                else if (seqStr === '승패승') finalMsg = "승패승? 오히려 좋아! 티밀 심장 쫄깃해지는 꽉 찬 승리 💦";
                 else if (seqStr === '승승승') finalMsg = "압도적인 무력! '모든 길은 결국 T1을 통한다' 3:0 압살 👑";
                 else if (seqStr === '패패승승승') finalMsg = "낭만 합격!!! 은빛 스크랩스와 함께하는 전설의 역스윕 대역전극!!! 😭🎉";
                 else if (wins === 3 && losses === 2) finalMsg = "숨막히는 혈전 끝에 3:2 승리! 넥서스가 터지는 순간 소리 질러!!! 🏆";
@@ -966,26 +965,154 @@
         }
 
         function updateTeemoGame() {
-
-        function gameOverDodge() {
-            dodgePlaying = false;
-            document.getElementById('dodge-overlay').style.background = "rgba(0, 0, 0, 0.7)";
-            document.getElementById('dodge-overlay').style.pointerEvents = "auto";
-            document.getElementById('dodge-score').style.display = "none";
+            if (!isTeemoPlaying) return;
+            tCtx.clearRect(0, 0, teemoCanvas.width, teemoCanvas.height);
             
-            let msg = ""; let color = "";
-            if (dodgeTime < 5) { msg = "아니 반응속도 실화?<br><span style='font-size:0.85rem; color:#aaa;'>애쉬 궁 다 맞아주네 😭</span>"; color = "#ccc"; } 
-            else if (dodgeTime < 15) { msg = "나쁘지 않은 무빙!<br><span style='font-size:0.85rem; color:#aaa;'>하지만 대상혁에겐 한참 모자랍니다. 🐢</span>"; color = "#00ff00"; } 
-            else if (dodgeTime < 30) { msg = "오! 폼 미쳤다!<br><span style='font-size:0.85rem; color:#aaa;'>한타 때 딜 좀 넣는 원딜 수준 무빙! ⚡</span>"; color = "#ffaa00"; } 
-            else { msg = "당신이 바로 2026년 T1의 에이스!<br><span style='font-size:0.85rem; color:#aaa;'>무빙 인정합니다 👑</span>"; color = "#ffcc00"; }
+            let progress = 1 - (teemoTimeLeft / teemoTotalTime);
+            let spawnRate = 0.03 + (progress * 0.10); 
+            let baseSpeed = 1.5 + (progress * 2.0); 
 
-            document.getElementById('dodge-result-score').innerText = dodgeTime.toFixed(2) + "초 생존!";
-            document.getElementById('dodge-result-score').style.color = color;
-            document.getElementById('dodge-result-score').style.display = "block";
-            document.getElementById('dodge-result-msg').innerHTML = msg; document.getElementById('dodge-result-msg').style.color = "#fff";
-            document.getElementById('start-dodge-btn').style.display = "block"; document.getElementById('start-dodge-btn').innerText = "다시 도전";
+            if (Math.random() < spawnRate) {
+                mushrooms.push({
+                    x: Math.random() * (teemoCanvas.width - 30), 
+                    y: -30, 
+                    width: 30, 
+                    height: 30, 
+                    speed: baseSpeed + (Math.random() * 1.5) 
+                });
+            }
+
+            for (let i = 0; i < mushrooms.length; i++) {
+                let m = mushrooms[i]; m.y += m.speed;
+                if (m.x < teemo.x + teemo.width - 15 && m.x + m.width > teemo.x + 15 && m.y < teemo.y + teemo.height && m.y + m.height > teemo.y + 10) {
+                    teemoScore++; document.getElementById('teemo-score').innerText = `점수: ${teemoScore}`;
+                    mushrooms.splice(i, 1); i--; continue;
+                }
+                if (m.y > teemoCanvas.height) { mushrooms.splice(i, 1); i--; }
+            }
+            drawTeemoFrame(); teemoGameLoop = requestAnimationFrame(updateTeemoGame);
         }
 
+        function drawTeemoFrame() {
+            mushrooms.forEach(m => {
+                if (imgMushroom.complete && imgMushroom.naturalWidth > 0) tCtx.drawImage(imgMushroom, m.x, m.y, m.width, m.height);
+                else { tCtx.fillStyle = 'purple'; tCtx.beginPath(); tCtx.arc(m.x + m.width/2, m.y + m.height/2, m.width/2, 0, Math.PI * 2); tCtx.fill(); }
+            });
+            if (imgTeemo.complete && imgTeemo.naturalWidth > 0) tCtx.drawImage(imgTeemo, teemo.x, teemo.y, teemo.width, teemo.height);
+            else { tCtx.fillStyle = 'brown'; tCtx.fillRect(teemo.x, teemo.y, teemo.width, teemo.height); }
+        }
+
+        function moveTeemo(e) {
+            if (!isTeemoPlaying) return; if (e.cancelable) e.preventDefault();
+            const rect = teemoCanvas.getBoundingClientRect(); const scaleX = teemoCanvas.width / rect.width;
+            let clientX = e.clientX; if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; }
+            let touchX = (clientX - rect.left) * scaleX;
+            teemo.x = touchX - (teemo.width / 2);
+            if (teemo.x < 0) teemo.x = 0;
+            if (teemo.x > teemoCanvas.width - teemo.width) teemo.x = teemoCanvas.width - teemo.width;
+        }
+
+        teemoCanvas.addEventListener('touchmove', moveTeemo, {passive: false});
+        teemoCanvas.addEventListener('mousemove', moveTeemo);
+
+        const dodgeModal = document.getElementById('dodge-modal');
+        const dodgeCanvas = document.getElementById('dodge-game-canvas');
+        const dCtx = dodgeCanvas.getContext('2d');
+        const imgGhost = new Image();
+        imgGhost.crossOrigin = "Anonymous";
+        imgGhost.src = "https://ddragon.leagueoflegends.com/cdn/14.3.1/img/spell/SummonerHaste.png";
+
+        let dodgePlaying = false, dodgeStartTime = 0, dodgeTime = 0, dodgeAnimationId, player = { x: 150, y: 150, radius: 12 }, enemies = [], frameCount = 0;
+
+        document.getElementById('open-dodge-modal').addEventListener('click', () => { dodgeModal.classList.add('active'); resetDodgeGame(); });
+        document.getElementById('close-dodge-modal').addEventListener('click', () => { dodgeModal.classList.remove('active'); dodgePlaying = false; cancelAnimationFrame(dodgeAnimationId); });
+        document.getElementById('start-dodge-btn').addEventListener('click', () => { startDodgeGame(); });
+
+        function resetDodgeGame() {
+            dodgePlaying = false; cancelAnimationFrame(dodgeAnimationId); dCtx.clearRect(0, 0, dodgeCanvas.width, dodgeCanvas.height);
+            player.x = 150; player.y = 150; enemies = [];
+            document.getElementById('dodge-result-score').style.display = "none"; document.getElementById('dodge-score').style.display = "block";
+            document.getElementById('dodge-score').innerText = "0.00초";
+            document.getElementById('dodge-result-msg').innerHTML = "유체화(흰색 공)를 꾹 누른 채로<br>사방에서 날아오는 애쉬 궁을 피하세요!";
+            document.getElementById('dodge-result-msg').style.color = "#ccc";
+            document.getElementById('start-dodge-btn').style.display = "block"; document.getElementById('start-dodge-btn').innerText = "훈련 시작";
+            document.getElementById('dodge-overlay').style.background = "rgba(0, 0, 0, 0.85)";
+            document.getElementById('dodge-overlay').style.pointerEvents = "auto";
+            drawDodgeFrame();
+        }
+
+        function startDodgeGame() {
+            dodgePlaying = true; dodgeStartTime = Date.now(); enemies = []; frameCount = 0;
+            document.getElementById('dodge-result-score').style.display = "none"; document.getElementById('dodge-score').style.display = "block";
+            document.getElementById('dodge-score').innerText = "0.00초";
+            document.getElementById('dodge-overlay').style.background = "transparent"; document.getElementById('dodge-overlay').style.pointerEvents = "none";
+            document.getElementById('start-dodge-btn').style.display = "none"; document.getElementById('dodge-result-msg').innerText = "";
+            dodgeLoop();
+        }
+
+        function movePlayer(e) {
+            if (!dodgePlaying) return; if (e.cancelable) e.preventDefault(); 
+            const rect = dodgeCanvas.getBoundingClientRect(); const scaleX = dodgeCanvas.width / rect.width; const scaleY = dodgeCanvas.height / rect.height;
+            let clientX = e.clientX; let clientY = e.clientY;
+            if (e.touches && e.touches.length > 0) { clientX = e.touches[0].clientX; clientY = e.touches[0].clientY; }
+            player.x = (clientX - rect.left) * scaleX; player.y = (clientY - rect.top) * scaleY;
+            if (player.x < player.radius) player.x = player.radius; if (player.x > dodgeCanvas.width - player.radius) player.x = dodgeCanvas.width - player.radius;
+            if (player.y < player.radius) player.y = player.radius; if (player.y > dodgeCanvas.height - player.radius) player.y = dodgeCanvas.height - player.radius;
+        }
+
+        dodgeCanvas.addEventListener('mousemove', movePlayer);
+        dodgeCanvas.addEventListener('touchmove', movePlayer, {passive: false});
+
+        function spawnEnemy() {
+            let side = Math.floor(Math.random() * 4); let ex, ey, vx, vy;
+            let speed = 2.0 + Math.random() * 1.5 + (dodgeTime / 12.0); 
+            let radius = 6 + Math.random() * 10;
+            if (side === 0) { ex = Math.random() * 300; ey = -20; vx = (Math.random() - 0.5) * 3; vy = speed; }
+            else if (side === 1) { ex = 320; ey = Math.random() * 300; vx = -speed; vy = (Math.random() - 0.5) * 3; }
+            else if (side === 2) { ex = 320; ey = Math.random() * 300; vx = (Math.random() - 0.5) * 3; vy = -speed; }
+            else { ex = -20; ey = Math.random() * 300; vx = speed; vy = (Math.random() - 0.5) * 3; }
+            enemies.push({ x: ex, y: ey, vx: vx, vy: vy, radius: radius });
+        }
+
+        function drawDodgeFrame() {
+            dCtx.clearRect(0, 0, dodgeCanvas.width, dodgeCanvas.height);
+            if (imgGhost.complete && imgGhost.naturalWidth > 0) {
+                dCtx.save(); dCtx.beginPath(); dCtx.arc(player.x, player.y, player.radius + 4, 0, Math.PI * 2); dCtx.closePath(); dCtx.clip();
+                dCtx.drawImage(imgGhost, player.x - player.radius - 4, player.y - player.radius - 4, (player.radius + 4) * 2, (player.radius + 4) * 2);
+                dCtx.restore();
+                dCtx.beginPath(); dCtx.arc(player.x, player.y, player.radius + 4, 0, Math.PI * 2); dCtx.strokeStyle = '#b366ff'; dCtx.lineWidth = 2; dCtx.stroke();
+            } else {
+                dCtx.fillStyle = '#fff'; dCtx.beginPath(); dCtx.arc(player.x, player.y, player.radius, 0, Math.PI * 2); dCtx.fill();
+            }
+
+            for (let i = 0; i < enemies.length; i++) {
+                let e = enemies[i];
+                dCtx.save(); dCtx.translate(e.x, e.y); dCtx.rotate(Math.atan2(e.vy, e.vx));
+                dCtx.shadowBlur = 10; dCtx.shadowColor = '#00bfff'; dCtx.fillStyle = '#fff'; dCtx.strokeStyle = '#00bfff'; dCtx.lineWidth = 2;
+                dCtx.beginPath(); dCtx.moveTo(e.radius * 1.8, 0); dCtx.lineTo(-e.radius, e.radius * 0.8); dCtx.lineTo(-e.radius * 0.4, 0); dCtx.lineTo(-e.radius, -e.radius * 0.8); dCtx.closePath();
+                dCtx.fill(); dCtx.stroke();
+                dCtx.fillStyle = '#00bfff'; dCtx.beginPath(); dCtx.moveTo(e.radius * 1.2, 0); dCtx.lineTo(-e.radius*0.6, e.radius * 0.4); dCtx.lineTo(-e.radius * 0.2, 0); dCtx.lineTo(-e.radius*0.6, -e.radius * 0.4); dCtx.closePath(); dCtx.fill();
+                dCtx.restore();
+            }
+        }
+
+        function dodgeLoop() {
+            if (!dodgePlaying) return;
+            dodgeTime = (Date.now() - dodgeStartTime) / 1000;
+            document.getElementById('dodge-score').innerText = dodgeTime.toFixed(2) + "초";
+            frameCount++;
+            
+            let currentSpawnRate = Math.max(15, 45 - Math.floor(dodgeTime * 1.0));
+            if (frameCount % currentSpawnRate === 0) spawnEnemy();
+
+            for (let i = 0; i < enemies.length; i++) {
+                let e = enemies[i]; e.x += e.vx; e.y += e.vy;
+                if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius - 2) { gameOverDodge(); return; }
+                if (e.x < -60 || e.x > 360 || e.y < -60 || e.y > 360) { enemies.splice(i, 1); i--; }
+            }
+            drawDodgeFrame(); dodgeAnimationId = requestAnimationFrame(dodgeLoop);
+        }
+        
         const clickerModal = document.getElementById('clicker-modal');
         let clickerTimer, clickerTimeLeft = 10.00, clickCount = 0, isClickerPlaying = false;
         
