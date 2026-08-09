@@ -966,17 +966,21 @@
         }
 
         function updateTeemoGame() {
-            if (!isTeemoPlaying) return;
-            tCtx.clearRect(0, 0, teemoCanvas.width, teemoCanvas.height);
-            let progress = 1 - (teemoTimeLeft / teemoTotalTime);
-            let spawnRate = 0.05 + (progress * 0.15); 
-            let baseSpeed = 2.5 + (progress * 4.0); // 난이도 조절 반영
+    // ... 생략 ...
+    let progress = 1 - (teemoTimeLeft / teemoTotalTime);
+    // 💡 버섯이 나오는 빈도를 조금 줄였어
+    let spawnRate = 0.03 + (progress * 0.10); 
+    // 💡 버섯이 떨어지는 기본 속도와 시간이 지날수록 빨라지는 정도를 크게 낮췄어
+    let baseSpeed = 1.5 + (progress * 2.0); 
 
-            if (Math.random() < spawnRate) {
-                mushrooms.push({
-                    x: Math.random() * (teemoCanvas.width - 30), y: -30, width: 30, height: 30, speed: baseSpeed + (Math.random() * 3) 
-                });
-            }
+    if (Math.random() < spawnRate) {
+        mushrooms.push({
+            // 💡 추가로 붙는 랜덤 가속도(Math.random() * 3)도 절반으로 줄였어
+            x: Math.random() * (teemoCanvas.width - 30), y: -30, width: 30, height: 30, speed: baseSpeed + (Math.random() * 1.5) 
+        });
+    }
+    // ... 생략 ...
+}
 
             for (let i = 0; i < mushrooms.length; i++) {
                 let m = mushrooms[i]; m.y += m.speed;
@@ -1060,15 +1064,19 @@
         dodgeCanvas.addEventListener('touchmove', movePlayer, {passive: false});
 
         function spawnEnemy() {
-            let side = Math.floor(Math.random() * 4); let ex, ey, vx, vy;
-            // 10% 상승된 난이도 반영
-            let speed = 3.0 + Math.random() * 3 + (dodgeTime / 7.0); 
-            let radius = 6 + Math.random() * 10;
-            if (side === 0) { ex = Math.random() * 300; ey = -20; vx = (Math.random() - 0.5) * 3; vy = speed; }
-            else if (side === 1) { ex = 320; ey = Math.random() * 300; vx = -speed; vy = (Math.random() - 0.5) * 3; }
-            else if (side === 2) { ex = 320; ey = Math.random() * 300; vx = (Math.random() - 0.5) * 3; vy = -speed; }
-            else { ex = -20; ey = Math.random() * 300; vx = speed; vy = (Math.random() - 0.5) * 3; }
-            enemies.push({ x: ex, y: ey, vx: vx, vy: vy, radius: radius });
+    let side = Math.floor(Math.random() * 4); let ex, ey, vx, vy;
+    // 💡 화살의 기본 속도, 랜덤 변수, 시간에 따른 가속도를 전부 다 낮췄어
+    let speed = 2.0 + Math.random() * 1.5 + (dodgeTime / 12.0); 
+    // ... 생략 ...
+}
+
+function dodgeLoop() {
+    // ... 생략 ...
+    // 💡 화살이 생성되는 쿨타임을 길게 늘리고, 시간이 지나도 너무 빨리 젠되지 않게 방어선(5 -> 15)을 높였어
+    let currentSpawnRate = Math.max(15, 45 - Math.floor(dodgeTime * 1.0));
+    if (frameCount % currentSpawnRate === 0) spawnEnemy();
+    // ... 생략 ...
+}
         }
 
         function drawDodgeFrame() {
