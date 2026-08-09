@@ -969,8 +969,10 @@
             tCtx.clearRect(0, 0, teemoCanvas.width, teemoCanvas.height);
             
             let progress = 1 - (teemoTimeLeft / teemoTotalTime);
-            let spawnRate = 0.03 + (progress * 0.10); 
-            let baseSpeed = 1.5 + (progress * 2.0); 
+            // 1. 버섯 생성 빈도 대폭 감소 (난이도 조절)
+            let spawnRate = 0.015 + (progress * 0.03); 
+            // 2. 기본 속도 낮춤
+            let baseSpeed = 1.0 + (progress * 1.5); 
 
             if (Math.random() < spawnRate) {
                 mushrooms.push({
@@ -978,7 +980,8 @@
                     y: -30, 
                     width: 30, 
                     height: 30, 
-                    speed: baseSpeed + (Math.random() * 1.5) 
+                    // 3. 속도 랜덤화 적용
+                    speed: Math.max(0.8, baseSpeed + (Math.random() * 4.0 - 1.0))
                 });
             }
 
@@ -1107,10 +1110,48 @@
 
             for (let i = 0; i < enemies.length; i++) {
                 let e = enemies[i]; e.x += e.vx; e.y += e.vy;
-                if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius - 2) { gameOverDodge(); return; }
+                // 충돌 감지 (게임 오버)
+                if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius - 2) { 
+                    gameOverDodge(); 
+                    return; 
+                }
                 if (e.x < -60 || e.x > 360 || e.y < -60 || e.y > 360) { enemies.splice(i, 1); i--; }
             }
             drawDodgeFrame(); dodgeAnimationId = requestAnimationFrame(dodgeLoop);
+        }
+
+        // 유체화 게임 오버 처리 함수 (추가된 부분)
+        function gameOverDodge() {
+            dodgePlaying = false;
+            cancelAnimationFrame(dodgeAnimationId);
+            
+            document.getElementById('dodge-score').style.display = "none";
+            document.getElementById('dodge-result-score').style.display = "block";
+            document.getElementById('dodge-result-score').innerText = dodgeTime.toFixed(2) + "초 생존!";
+            
+            let msg = "";
+            let color = "#fff";
+            if (dodgeTime < 5) { 
+                msg = "유체화 킨 거 맞지...? 😭"; 
+                color = "#ccc"; 
+            } else if (dodgeTime < 15) { 
+                msg = "무난한 무빙! 하지만 아직 부족해 🏃"; 
+                color = "#00ff7f"; 
+            } else if (dodgeTime < 30) { 
+                msg = "협곡의 데몬 등장! 이 정도면 챌린저급 무빙 🔥"; 
+                color = "#ffd700"; 
+            } else { 
+                msg = "핵 아냐?! 대상혁 빙의 완벽 회피! 👑"; 
+                color = "#ff3355"; 
+            }
+            
+            document.getElementById('dodge-result-msg').innerHTML = msg;
+            document.getElementById('dodge-result-msg').style.color = color;
+            
+            document.getElementById('start-dodge-btn').style.display = "block";
+            document.getElementById('start-dodge-btn').innerText = "다시 훈련";
+            document.getElementById('dodge-overlay').style.background = "rgba(0, 0, 0, 0.85)";
+            document.getElementById('dodge-overlay').style.pointerEvents = "auto";
         }
         
         const clickerModal = document.getElementById('clicker-modal');
