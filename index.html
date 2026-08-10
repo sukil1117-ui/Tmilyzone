@@ -111,7 +111,6 @@
         .roster-subtitle { text-align: center; font-family: 'Orbitron', sans-serif; color: var(--silver-accent); font-size: 1.2rem; letter-spacing: 2px; margin: 3rem 0 1.5rem 0; font-weight: 700; border-bottom: 1px solid rgba(212, 212, 216, 0.2); padding-bottom: 0.5rem; }
         .team-desc { text-align: center; font-size: 0.9rem; color: #bbb; line-height: 1.6; margin-bottom: 2.5rem; word-break: keep-all; padding: 0 1rem; }
 
-        /* 수정 4. 로스터 섹션 크기를 페이커 사이즈(280px)와 동일하게 수정 */
         .player-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 1.5rem; }
         .player-card {
             width: 100%; max-width: 280px; margin: 0 auto;
@@ -122,6 +121,14 @@
 
         .meme-card { cursor: pointer; -webkit-tap-highlight-color: transparent; }
         .meme-card.active { border-style: dashed; border-width: 4px; border-radius: 20px; border-color: var(--t1-red); box-shadow: 0 8px 20px rgba(226, 1, 45, 0.25); background: rgba(226, 1, 45, 0.05); transform: translateY(-5px); }
+
+        /* 밈 카드 전용 동물 이모지 (평소엔 숨김, active 시 등장) */
+        .player-card .decorations { 
+            position: absolute; top: 15px; right: 15px; font-size: 1.5rem; z-index: 10; filter: drop-shadow(0 0 10px var(--t1-red-glow)); letter-spacing: 5px; 
+            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
+        }
+        .player-card.active .decorations { opacity: 1; }
+        .faker-special .decorations { filter: drop-shadow(0 0 10px #ffd700); }
 
         .player-img { position: relative; width: 100%; aspect-ratio: 1; overflow: hidden; margin-bottom: 1.2rem; background-color: #111; border-bottom: 1px solid rgba(212, 212, 216, 0.2); }
         .player-img img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; transition: all 0.4s ease; }
@@ -137,7 +144,7 @@
         .keria-img .normal-img { transform: scale(1) translateY(0%); transform-origin: top center; }
 
         .player-card:not(.meme-card):hover .normal-img { transform: scale(1.1); }
-        .player-card.meme-card:not(.active):hover .normal-img { transform: scale(1.1); } /* 호버 시에도 교정된 스케일 유지하며 확대 */
+        .player-card.meme-card:not(.active):hover .normal-img { transform: scale(1.1); }
         
         .meme-card.active .normal-img { opacity: 0; transform: scale(0.95); }
         .meme-card.active .goofy-img { opacity: 1; transform: scale(1.05); }
@@ -160,14 +167,6 @@
         .faker-solo { display: flex; justify-content: center; margin-bottom: 2rem; width: 100%; }
         .faker-special { border-color: #ffd700; box-shadow: 0 0 30px rgba(255, 215, 0, 0.6); border-top-color: #ffd700; }
         .faker-special .player-img { background: #111; border-bottom-color: #ffd700; }
-        
-        /* 수정 3. 노말 버전에서는 숨기고, active(밈 선택) 상태에서만 나타나도록 투명도(opacity) 제어 */
-        .faker-special .decorations { 
-            position: absolute; top: 15px; right: 15px; font-size: 1.5rem; z-index: 10; filter: drop-shadow(0 0 10px #ffd700); letter-spacing: 5px; 
-            opacity: 0; transition: opacity 0.3s ease; pointer-events: none;
-        }
-        .faker-special.active .decorations { opacity: 1; }
-        
         .faker-special.active { border-color: #ffd700; box-shadow: 0 0 40px rgba(255, 215, 0, 0.8); }
 
         .modal-overlay {
@@ -544,6 +543,7 @@
 
             <div class="player-grid">
                 <div class="player-card meme-card">
+                    <div class="decorations">🐿️</div>
                     <div class="player-img doran-img">
                         <img src="doran-normal.JPG" alt="Doran" class="normal-img">
                         <img src="doran-meme.jpg" alt="Doran Meme" class="goofy-img" onerror="this.src='https://placehold.co/300x300/111/fff?text=Doran+Meme'">
@@ -557,6 +557,7 @@
                     <div class="goofy-desc">원딜발견!!!!!!</div>
                 </div>
                 <div class="player-card meme-card">
+                    <div class="decorations">🐯</div>
                     <div class="player-img oner-img">
                         <img src="oner-normal.jpg" alt="Oner" class="normal-img">
                         <img src="oner-meme.jpg" alt="Oner Meme" class="goofy-img">
@@ -570,6 +571,7 @@
                     <div class="goofy-desc">좋은 소식이네</div>
                 </div>
                 <div class="player-card meme-card">
+                    <div class="decorations">🐨</div>
                     <div class="player-img peyz-img">
                         <img src="peyz-normal.jpg" class="normal-img" onerror="this.src='https://placehold.co/300x300/111/fff?text=Peyz'">
                         <img src="peyz-meme.jpg" alt="Peyz Meme" class="goofy-img" onerror="...">
@@ -583,6 +585,7 @@
                     <div class="goofy-desc">... (아직 막내라 눈빛만 보내는 듯 하다)</div>
                 </div>
                 <div class="player-card meme-card">
+                    <div class="decorations">🐶</div>
                     <div class="player-img keria-img">
                         <img src="keria-normal.JPG" alt="Keria" class="normal-img">
                         <img src="keria-meme.jpg" alt="Keria Meme" class="goofy-img">
@@ -920,7 +923,6 @@
         let isTeemoPlaying = false, teemoScore = 0, teemoTimeLeft = 0, teemoTotalTime = 30, teemoGameLoop, teemoTimerInterval;
         let mushrooms = [];
         let teemo = { x: 120, y: 230, width: 60, height: 60 };
-        let lastTeemoTime = 0; // 모바일 속도 보정을 위한 기준 시간
 
         document.getElementById('open-teemo-modal').addEventListener('click', () => { teemoModal.classList.add('active'); resetTeemoGame(); drawTeemoFrame(); });
         document.getElementById('close-teemo-modal').addEventListener('click', () => { teemoModal.classList.remove('active'); endTeemoGame(false); });
@@ -946,14 +948,12 @@
             document.getElementById('teemo-time').innerText = `시간: ${teemoTimeLeft}초`;
             document.getElementById('teemo-start-overlay').style.display = 'none';
 
-            lastTeemoTime = performance.now(); // 시간 초기화
-
             teemoTimerInterval = setInterval(() => {
                 teemoTimeLeft--;
                 document.getElementById('teemo-time').innerText = `시간: ${teemoTimeLeft}초`;
                 if (teemoTimeLeft <= 0) endTeemoGame(true);
             }, 1000);
-            teemoGameLoop = requestAnimationFrame(updateTeemoGame);
+            updateTeemoGame();
         }
 
         function endTeemoGame(showResult) {
@@ -974,34 +974,28 @@
             }
         }
 
-        function updateTeemoGame(currentTime) {
+        function updateTeemoGame() {
             if (!isTeemoPlaying) return;
-            
-            // 모바일 60hz, PC 144hz 등 기기 환경 차이를 보정하는 로직
-            let dt = (currentTime - lastTeemoTime) / 16.666;
-            if (dt > 3) dt = 3; 
-            lastTeemoTime = currentTime;
-
             tCtx.clearRect(0, 0, teemoCanvas.width, teemoCanvas.height);
             
             let progress = 1 - (teemoTimeLeft / teemoTotalTime);
-            // 맨 처음 요청하신 오리지널 생성/속도 수치로 복구!
+            // 맨 처음 제공해주신 속도 및 스폰 로직으로 원복 (프레임 보정 없이 순수 스피드 적용)
             let spawnRate = 0.03 + (progress * 0.10); 
             let baseSpeed = 1.5 + (progress * 2.0); 
 
-            if (Math.random() < spawnRate * dt) {
+            if (Math.random() < spawnRate) {
                 mushrooms.push({
                     x: Math.random() * (teemoCanvas.width - 30), 
                     y: -30, 
                     width: 30, 
                     height: 30, 
-                    speed: baseSpeed + (Math.random() * 1.5) // 원래 속도 복구
+                    speed: baseSpeed + (Math.random() * 1.5) 
                 });
             }
 
             for (let i = 0; i < mushrooms.length; i++) {
                 let m = mushrooms[i]; 
-                m.y += m.speed * dt; // 프레임 보정 속도 반영
+                m.y += m.speed; 
                 if (m.x < teemo.x + teemo.width - 15 && m.x + m.width > teemo.x + 15 && m.y < teemo.y + teemo.height && m.y + m.height > teemo.y + 10) {
                     teemoScore++; document.getElementById('teemo-score').innerText = `점수: ${teemoScore}`;
                     mushrooms.splice(i, 1); i--; continue;
@@ -1041,7 +1035,6 @@
         imgGhost.src = "https://ddragon.leagueoflegends.com/cdn/14.3.1/img/spell/SummonerHaste.png";
 
         let dodgePlaying = false, dodgeStartTime = 0, dodgeTime = 0, dodgeAnimationId, player = { x: 150, y: 150, radius: 12 }, enemies = [], frameCount = 0;
-        let lastDodgeTime = 0; // 모바일 속도 보정을 위한 기준 시간
 
         document.getElementById('open-dodge-modal').addEventListener('click', () => { dodgeModal.classList.add('active'); resetDodgeGame(); });
         document.getElementById('close-dodge-modal').addEventListener('click', () => { dodgeModal.classList.remove('active'); dodgePlaying = false; cancelAnimationFrame(dodgeAnimationId); });
@@ -1067,8 +1060,7 @@
             document.getElementById('dodge-overlay').style.background = "transparent"; document.getElementById('dodge-overlay').style.pointerEvents = "none";
             document.getElementById('start-dodge-btn').style.display = "none"; document.getElementById('dodge-result-msg').innerText = "";
             
-            lastDodgeTime = performance.now(); // 시간 초기화
-            dodgeAnimationId = requestAnimationFrame(dodgeLoop);
+            dodgeLoop();
         }
 
         function movePlayer(e) {
@@ -1086,7 +1078,7 @@
 
         function spawnEnemy() {
             let side = Math.floor(Math.random() * 4); let ex, ey, vx, vy;
-            // 무빙 훈련 기본 속도 유지
+            // 무빙 훈련 기본 속도 및 스폰 로직 원복
             let speed = 2.0 + Math.random() * 1.5 + (dodgeTime / 12.0); 
             let radius = 6 + Math.random() * 10;
             if (side === 0) { ex = Math.random() * 300; ey = -20; vx = (Math.random() - 0.5) * 3; vy = speed; }
@@ -1118,28 +1110,20 @@
             }
         }
 
-        function dodgeLoop(currentTime) {
+        function dodgeLoop() {
             if (!dodgePlaying) return;
             
-            // 모바일 60hz 프레임 보정 (티모 게임과 동일 적용)
-            let dt = (currentTime - lastDodgeTime) / 16.666;
-            if (dt > 3) dt = 3;
-            lastDodgeTime = currentTime;
-
             dodgeTime = (Date.now() - dodgeStartTime) / 1000;
             document.getElementById('dodge-score').innerText = dodgeTime.toFixed(2) + "초";
-            frameCount += dt;
+            frameCount++;
             
             let currentSpawnRate = Math.max(15, 45 - Math.floor(dodgeTime * 1.0));
-            if (frameCount >= currentSpawnRate) {
-                spawnEnemy();
-                frameCount = 0;
-            }
+            if (frameCount % currentSpawnRate === 0) spawnEnemy();
 
             for (let i = 0; i < enemies.length; i++) {
                 let e = enemies[i]; 
-                e.x += e.vx * dt; // 프레임 보정 반영
-                e.y += e.vy * dt; // 프레임 보정 반영
+                e.x += e.vx; 
+                e.y += e.vy; 
                 
                 if (Math.hypot(player.x - e.x, player.y - e.y) < player.radius + e.radius - 2) { 
                     gameOverDodge(); 
